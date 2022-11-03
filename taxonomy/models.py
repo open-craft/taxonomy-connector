@@ -102,6 +102,119 @@ class Skill(TimeStampedModel):
         app_label = 'taxonomy'
 
 
+class XblockSkills(TimeStampedModel):
+    """
+    Skills that will be learnt by completing xblock.
+
+    .. no_pii:
+    """
+
+    usage_key = models.CharField(
+        unique=True,
+        max_length=255,
+        help_text=_('The key of the xblock whose text was used for skills extraction.')
+    )
+    skills = models.ManyToManyField(
+        Skill,
+        through="XblockSkillThrough",
+        help_text=_(
+            'The ID of the skill extracted for the xblock.'
+        )
+    )
+    requires_verification = models.BooleanField(
+        default=True,
+        help_text=_('Indicates whether skills applied to this block requires verification from users'),
+    )
+    auto_processed = models.BooleanField(
+        default=False,
+        help_text=_('Indicates whether the text from this block was already processed'),
+    )
+
+    class Meta:
+        """
+        Meta configuration for CourseSkills model.
+        """
+
+        verbose_name = 'Xblock Skills'
+        verbose_name_plural = 'Xblock Skills'
+        ordering = ('created', )
+        app_label = 'taxonomy'
+
+    def __str__(self):
+        """
+        Create a human-readable string representation of the object.
+        """
+        return '<XblockSkills usage_key="{}">'.format(self.usage_key)
+
+    def __repr__(self):
+        """
+        Create a unique string representation of the object.
+        """
+        return '<XblockSkills id="{0}">'.format(self.id)
+
+
+class XblockSkillThrough(TimeStampedModel):
+    """
+    Skills that will be learnt by completing xblock.
+
+    .. no_pii:
+    """
+
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    xblock = models.ForeignKey(XblockSkills, on_delete=models.CASCADE)
+    relevant_count = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text=_('Number of times learners verified this skill')
+    )
+    irrelevant_count = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text=_('Number of times learners ignored this skill')
+    )
+    verified = models.BooleanField(
+        default=False,
+        help_text=_('Indicates that this skill has been finalized for this block'),
+    )
+    confidence = models.FloatField(
+        blank=False,
+        help_text=_(
+            'The extraction confidence threshold used for the skills extraction.'
+        )
+    )
+    is_blacklisted = models.BooleanField(
+        help_text=_('Blacklist this xblock skill, useful to handle false positives.'),
+        default=False,
+    )
+
+    class Meta:
+        """
+        Meta configuration for CourseSkills model.
+        """
+
+        verbose_name = 'Tagged item'
+        verbose_name_plural = 'Tagged items'
+        ordering = ('created', )
+        app_label = 'taxonomy'
+        unique_together = ('xblock', 'skill')
+
+    def __str__(self):
+        """
+        Create a human-readable string representation of the object.
+        """
+        return '<XblockSkillThrough usage_key="{}" skill="{}" verified="{}">'.format(
+            self.xblock.usage_key,
+            self.skill.name,
+            self.verified,
+        )
+
+    def __repr__(self):
+        """
+        Create a unique string representation of the object.
+        """
+        return '<XblockSkillThrough id="{0}">'.format(self.id)
+
+
 class CourseSkills(TimeStampedModel):
     """
     Skills that will be learnt by taking the course.
