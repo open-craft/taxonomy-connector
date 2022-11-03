@@ -50,3 +50,21 @@ class MockProgram(MagicMock):
         self.title = title if title is not DEFAULT else 'Test Program {}'.format(FAKER.sentence())
         self.subtitle = subtitle if subtitle is not DEFAULT else 'Test Program Subtitle {}'.format(FAKER.sentence())
         self.overview = overview if overview is not DEFAULT else FAKER.sentence(nb_words=50)
+
+
+class MockXblock(MagicMock):
+    """
+    Mock object for course.
+    """
+    # pylint: disable=keyword-arg-before-vararg
+    def __init__(
+            self, key=DEFAULT, content_type=DEFAULT, content=DEFAULT, *args, **kwargs
+    ):
+        """
+        Initialize course related attributes.
+        """
+        super().__init__(*args, **kwargs)
+
+        self.key = key if key is not DEFAULT else 'xblock-id/{}'.format(FAKER.slug())
+        self.content_type = content_type if content_type is not DEFAULT else 'Video'
+        self.content = content if content is not DEFAULT else FAKER.sentence(nb_words=50)
