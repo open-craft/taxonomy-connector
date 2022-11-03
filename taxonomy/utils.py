@@ -19,7 +19,7 @@ from taxonomy.constants import (
 )
 from taxonomy.emsi.client import EMSISkillsApiClient
 from taxonomy.exceptions import TaxonomyAPIError
-from taxonomy.models import CourseSkills, ProgramSkill, JobSkills, Skill, Translation
+from taxonomy.models import CourseSkills, ProgramSkill, JobSkills, Skill, Translation, XblockSkillThrough, XblockSkills
 from taxonomy.serializers import SkillSerializer
 
 LOGGER = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ def get_product_identifier(product_type):
     identifier = None
     if product_type == ProductTypes.Program:
         identifier = 'uuid'
-    elif product_type == ProductTypes.Course:
+    elif product_type in (ProductTypes.Course, ProductTypes.Xblock):
         identifier = 'key'
 
     return identifier
@@ -81,26 +81,33 @@ def get_product_skill_model_and_identifier(product_type):
     """
     Return the Skill Model along with its identifier based on product type.
     """
-    return (ProgramSkill, 'program_uuid') if product_type == ProductTypes.Program else (CourseSkills, 'course_key')
+    if product_type == ProductTypes.Program:
+        return (ProgramSkill, 'program_uuid')
+    if product_type == ProductTypes.Xblock:
+        return (XblockSkills, 'usage_key')
+    if product_type == ProductTypes.XblockThrough:
+        return (XblockSkillThrough, 'xblock_id')
+    return (CourseSkills, 'course_key')
 
 
 def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, product_type):
     """
-    Persist the skills data in the database either for Program or Course.
+    Persist the skills data in the database for Program, Course or Xblock.
     """
-    skill, __ = Skill.objects.update_or_create(external_id=skill_external_id, defaults=skill_data)
+    skill, _ = Skill.objects.update_or_create(external_id=skill_external_id, defaults=skill_data)
+    if product_type == ProductTypes.Xblock:
+        x_model, x_identifier = get_product_skill_model_and_identifier(product_type)
+        product_type = ProductTypes.XblockThrough
+        xblock, _ = x_model.objects.get_or_create(**{x_identifier: key_or_uuid})
+        key_or_uuid = xblock.id
+    if is_skill_blacklisted(key_or_uuid, skill.id, product_type):
+        return
     skill_model, identifier = get_product_skill_model_and_identifier(product_type)
-    kwargs = {
-        identifier: key_or_uuid,
-        'skill': skill,
-    }
-    defaults = {
-        'confidence': confidence
-    }
-    if not is_skill_blacklisted(key_or_uuid, skill.id, product_type):
-        _, created = skill_model.objects.update_or_create(**kwargs, defaults=defaults)
-        action = 'created' if created else 'updated'
-        LOGGER.error(f'{skill_model} {action} for key {key_or_uuid}')
+    kwargs = {identifier: key_or_uuid, "skill": skill}
+    defaults = {"confidence": confidence}
+    _, created = skill_model.objects.update_or_create(**kwargs, defaults=defaults)
+    action = 'created' if created else 'updated'
+    LOGGER.error(f'{skill_model} {action} for key {key_or_uuid}')
 
 
 def process_skills_data(product, skills, should_commit_to_db, product_type):
@@ -146,7 +153,11 @@ def get_translation_attr(product_type):
     """
     Return properties based on product type.
     """
-    return 'overview' if product_type == ProductTypes.Program else COURSE_METADATA_FIELDS_COMBINED
+    if product_type == ProductTypes.Program:
+        return 'overview'
+    if product_type == ProductTypes.Xblock:
+        return 'content'
+    return COURSE_METADATA_FIELDS_COMBINED
 
 
 def get_course_metadata_fields_text(course_attrs_string, course):
@@ -176,9 +187,15 @@ def refresh_product_skills(products, should_commit_to_db, product_type):
         else:
             skill_attr_val = product[skill_extraction_attr]
         if skill_attr_val:
-            translated_skill_attr = get_translated_skill_attribute_val(
-                product[key_or_uuid], skill_attr_val, product_type
-            )
+            # TODO: Skip translation for xblock text till we find better way to
+            # handle huge amounts of text
+            if product_type != ProductTypes.Xblock:
+                translated_skill_attr = get_translated_skill_attribute_val(
+                    product[key_or_uuid], skill_attr_val, product_type
+                )
+            else:
+                # TODO: make sure that skill_attr_val is in english
+                translated_skill_attr = skill_attr_val
             try:
                 # EMSI only allows 5 requests/sec
                 # We need to add one sec delay after every 5 requests to prevent 429 errors
