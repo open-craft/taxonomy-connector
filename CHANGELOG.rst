@@ -15,7 +15,8 @@ Unreleased
 
 [1.29.0] - 2022-11-22
 ---------------------
-* Added XBlockSkills and XBlockSkillThrough models.
+* Added XBlockSkills and XBlockSkillData models.
+* Added related celery tasks, abstract provider, signals and commands.
 
 [1.28.1] - 2022-11-22
 ---------------------

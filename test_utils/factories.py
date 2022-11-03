@@ -12,7 +12,7 @@ from faker import Faker
 from taxonomy.models import (
     CourseSkills, Job, JobPostings, JobSkills, Skill, Translation, SkillCategory, SkillSubCategory, ProgramSkill,
     SkillsQuiz, RefreshCourseSkillsConfig, RefreshProgramSkillsConfig, Industry, IndustryJobSkill,
-    XblockSkillThrough, XblockSkills
+    XBlockSkillData, XBlockSkills
 )
 from taxonomy.choices import UserGoal
 
