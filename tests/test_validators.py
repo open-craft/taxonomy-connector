@@ -7,9 +7,9 @@ validation logic inside host platform.
 from taxonomy.validators import (
     CourseMetadataProviderValidator,
     ProgramMetadataProviderValidator,
-    XblockMetadataProviderValidator,
+    XBlockMetadataProviderValidator,
 )
-from test_utils.mocks import MockCourse, MockProgram, MockXblock
+from test_utils.mocks import MockCourse, MockProgram, MockXBlock
 from test_utils.testcase import TaxonomyTestCase
 
 
@@ -59,19 +59,19 @@ class TestProgramMetadataProviderValidator(TaxonomyTestCase):
         self.program_metadata_validator.validate()
 
 
-class TestXblockMetadataProviderValidator(TaxonomyTestCase):
+class TestXBlockMetadataProviderValidator(TaxonomyTestCase):
     """
     Validate that validation logic does not have any errors.
     """
 
     def setUp(self):
         """
-        Instantiate an instance of XblockMetadataProviderValidator for use inside tests.
+        Instantiate an instance of XBlockMetadataProviderValidator for use inside tests.
         """
-        super(TestXblockMetadataProviderValidator, self).setUp()
-        self.xblock = MockXblock()
+        super(TestXBlockMetadataProviderValidator, self).setUp()
+        self.xblock = MockXBlock()
 
-        self.xblock_metadata_validator = XblockMetadataProviderValidator(
+        self.xblock_metadata_validator = XBlockMetadataProviderValidator(
             [str(self.xblock.key)]
         )
 

@@ -19,7 +19,7 @@ from taxonomy.constants import (
 )
 from taxonomy.emsi.client import EMSISkillsApiClient
 from taxonomy.exceptions import TaxonomyAPIError
-from taxonomy.models import CourseSkills, ProgramSkill, JobSkills, Skill, Translation, XblockSkillThrough, XblockSkills
+from taxonomy.models import CourseSkills, ProgramSkill, JobSkills, Skill, Translation, XBlockSkillThrough, XBlockSkills
 from taxonomy.serializers import SkillSerializer
 
 LOGGER = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ def get_product_identifier(product_type):
     identifier = None
     if product_type == ProductTypes.Program:
         identifier = 'uuid'
-    elif product_type in (ProductTypes.Course, ProductTypes.Xblock):
+    elif product_type in (ProductTypes.Course, ProductTypes.XBlock):
         identifier = 'key'
 
     return identifier
@@ -83,21 +83,21 @@ def get_product_skill_model_and_identifier(product_type):
     """
     if product_type == ProductTypes.Program:
         return (ProgramSkill, 'program_uuid')
-    if product_type == ProductTypes.Xblock:
-        return (XblockSkills, 'usage_key')
-    if product_type == ProductTypes.XblockThrough:
-        return (XblockSkillThrough, 'xblock_id')
+    if product_type == ProductTypes.XBlock:
+        return (XBlockSkills, 'usage_key')
+    if product_type == ProductTypes.XBlockThrough:
+        return (XBlockSkillThrough, 'xblock_id')
     return (CourseSkills, 'course_key')
 
 
 def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, product_type):
     """
-    Persist the skills data in the database for Program, Course or Xblock.
+    Persist the skills data in the database for Program, Course or XBlock.
     """
     skill, _ = Skill.objects.update_or_create(external_id=skill_external_id, defaults=skill_data)
-    if product_type == ProductTypes.Xblock:
+    if product_type == ProductTypes.XBlock:
         x_model, x_identifier = get_product_skill_model_and_identifier(product_type)
-        product_type = ProductTypes.XblockThrough
+        product_type = ProductTypes.XBlockThrough
         xblock, _ = x_model.objects.get_or_create(**{x_identifier: key_or_uuid})
         key_or_uuid = xblock.id
     if is_skill_blacklisted(key_or_uuid, skill.id, product_type):
@@ -155,7 +155,7 @@ def get_translation_attr(product_type):
     """
     if product_type == ProductTypes.Program:
         return 'overview'
-    if product_type == ProductTypes.Xblock:
+    if product_type == ProductTypes.XBlock:
         return 'content'
     return COURSE_METADATA_FIELDS_COMBINED
 
@@ -189,7 +189,7 @@ def refresh_product_skills(products, should_commit_to_db, product_type):
         if skill_attr_val:
             # TODO: Skip translation for xblock text till we find better way to
             # handle huge amounts of text
-            if product_type != ProductTypes.Xblock:
+            if product_type != ProductTypes.XBlock:
                 translated_skill_attr = get_translated_skill_attribute_val(
                     product[key_or_uuid], skill_attr_val, product_type
                 )

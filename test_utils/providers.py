@@ -3,8 +3,8 @@
 An implementation of providers to be used in tests.
 """
 
-from taxonomy.providers import CourseMetadataProvider, ProgramMetadataProvider, XblockMetadataProvider
-from test_utils.mocks import MockCourse, MockProgram, MockXblock
+from taxonomy.providers import CourseMetadataProvider, ProgramMetadataProvider, XBlockMetadataProvider
+from test_utils.mocks import MockCourse, MockProgram, MockXBlock
 
 
 class DiscoveryCourseMetadataProvider(CourseMetadataProvider):
@@ -93,7 +93,7 @@ class DiscoveryProgramMetadataProvider(ProgramMetadataProvider):
             }
 
 
-class DiscoveryXblockMetadataProvider(XblockMetadataProvider):
+class DiscoveryXBlockMetadataProvider(XBlockMetadataProvider):
     """
     Discovery xblock metadata provider to be used in the tests.
     """
@@ -102,14 +102,14 @@ class DiscoveryXblockMetadataProvider(XblockMetadataProvider):
         """
         Initialize with mocked courses.
         """
-        super(DiscoveryXblockMetadataProvider, self).__init__()
+        super(DiscoveryXBlockMetadataProvider, self).__init__()
         self.mock_xblocks = mock_xblocks
 
     def get_xblocks(self, xblock_ids):
         if self.mock_xblocks is not None:
             xblocks = self.mock_xblocks
         else:
-            xblocks = [MockXblock(key=xblock_id) for xblock_id in xblock_ids]
+            xblocks = [MockXBlock(key=xblock_id) for xblock_id in xblock_ids]
 
         return [{
             'key': xblock.key,
@@ -124,7 +124,7 @@ class DiscoveryXblockMetadataProvider(XblockMetadataProvider):
         if self.mock_xblocks is not None:
             xblocks = self.mock_xblocks
         else:
-            xblocks = [MockXblock() for _ in range(5)]
+            xblocks = [MockXBlock() for _ in range(5)]
         for xblock in xblocks:
             yield {
                 'key': xblock.key,

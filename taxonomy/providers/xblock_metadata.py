@@ -7,7 +7,7 @@ All host platform must implement this provider in order for taxonomy to work.
 from abc import abstractmethod
 
 
-class XblockMetadataProvider:
+class XBlockMetadataProvider:
     """
     Abstract base class for xblock metadata providers.
 
