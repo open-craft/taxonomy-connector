@@ -52,7 +52,7 @@ class MockProgram(MagicMock):
         self.overview = overview if overview is not DEFAULT else FAKER.sentence(nb_words=50)
 
 
-class MockXblock(MagicMock):
+class MockXBlock(MagicMock):
     """
     Mock object for course.
     """

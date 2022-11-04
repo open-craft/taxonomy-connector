@@ -220,10 +220,10 @@ class TestUtils(TaxonomyTestCase):
         """
         Validate that update_xblock_skills_data works as expected.
         """
-        xblock = factories.XblockSkillsFactory(usage_key=USAGE_KEY)
-        black_listed_xblock_skill = factories.XblockSkillThroughFactory(xblock=xblock, is_blacklisted=True)
+        xblock = factories.XBlockSkillsFactory(usage_key=USAGE_KEY)
+        black_listed_xblock_skill = factories.XBlockSkillThroughFactory(xblock=xblock, is_blacklisted=True)
         skills_count = Skill.objects.count()
-        product_type = ProductTypes.Xblock
+        product_type = ProductTypes.XBlock
         utils.update_skills_data(
             key_or_uuid=USAGE_KEY,
             skill_external_id=black_listed_xblock_skill.skill.external_id,
@@ -261,21 +261,21 @@ class TestUtils(TaxonomyTestCase):
         # make sure no new `Skill` object created.
         assert Skill.objects.count() == skills_count
 
-        # Make sure `XblockSkills` is not removed from the blacklist.
+        # Make sure `XBlockSkills` is not removed from the blacklist.
         assert utils.is_skill_blacklisted(
             xblock.id,
             black_listed_xblock_skill.skill.id,
-            ProductTypes.XblockThrough,
+            ProductTypes.XBlockThrough,
         ) is True
-        xblock_skill = models.XblockSkillThrough.objects.get(
+        xblock_skill = models.XBlockSkillThrough.objects.get(
             xblock=xblock,
             skill=black_listed_xblock_skill.skill,
         )
         assert xblock_skill.is_blacklisted is True
 
         # Make sure that skill that was not black listed is added with no issues.
-        assert utils.is_skill_blacklisted(xblock.id, self.skill.id, ProductTypes.XblockThrough) is False
-        assert models.XblockSkillThrough.objects.filter(
+        assert utils.is_skill_blacklisted(xblock.id, self.skill.id, ProductTypes.XBlockThrough) is False
+        assert models.XBlockSkillThrough.objects.filter(
             xblock=xblock,
             skill=self.skill,
             is_blacklisted=False,

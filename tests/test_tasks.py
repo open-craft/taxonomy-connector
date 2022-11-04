@@ -8,13 +8,13 @@ import mock
 from pytest import mark
 from testfixtures import LogCapture
 
-from taxonomy.models import CourseSkills, Skill, ProgramSkill, XblockSkills
+from taxonomy.models import CourseSkills, Skill, ProgramSkill, XBlockSkills
 from taxonomy.tasks import update_course_skills, update_program_skills, update_xblock_skills
-from test_utils.mocks import MockCourse, MockProgram, MockXblock
+from test_utils.mocks import MockCourse, MockProgram, MockXBlock
 from test_utils.providers import (
     DiscoveryCourseMetadataProvider,
     DiscoveryProgramMetadataProvider,
-    DiscoveryXblockMetadataProvider,
+    DiscoveryXBlockMetadataProvider,
 )
 from test_utils.sample_responses.skills import SKILLS_EMSI_CLIENT_RESPONSE
 
@@ -29,7 +29,7 @@ class TaxonomyTasksTests(unittest.TestCase):
         self.skills_emsi_client_response = SKILLS_EMSI_CLIENT_RESPONSE
         self.course = MockCourse()
         self.program = MockProgram()
-        self.xblock = MockXblock()
+        self.xblock = MockXBlock()
         super().setUp()
 
     def check_empty_skill_models(self, product_skill_model):
@@ -135,9 +135,9 @@ class TaxonomyTasksTests(unittest.TestCase):
         Verify that `update_xblock_skills` task work as expected.
         """
         get_xblock_skills_mock.return_value = self.skills_emsi_client_response
-        get_xblock_provider_mock.return_value = DiscoveryXblockMetadataProvider([self.xblock])
+        get_xblock_provider_mock.return_value = DiscoveryXBlockMetadataProvider([self.xblock])
 
-        skill, xblock_skill = self.check_empty_skill_models(XblockSkills)
+        skill, xblock_skill = self.check_empty_skill_models(XBlockSkills)
 
         update_xblock_skills.delay([self.xblock.key])
 
@@ -152,9 +152,9 @@ class TaxonomyTasksTests(unittest.TestCase):
         Verify that `update_skills` task work as expected.
         """
         get_course_skills_mock.return_value = self.skills_emsi_client_response
-        get_course_provider_mock.return_value = DiscoveryXblockMetadataProvider([])
+        get_course_provider_mock.return_value = DiscoveryXBlockMetadataProvider([])
 
-        skill, xblock_skill = self.check_empty_skill_models(XblockSkills)
+        skill, xblock_skill = self.check_empty_skill_models(XBlockSkills)
 
         with LogCapture(level=logging.INFO) as log_capture:
             update_xblock_skills.delay([self.xblock.key])
