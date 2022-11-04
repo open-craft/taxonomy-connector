@@ -91,36 +91,36 @@ class TestCourseSkills(TestCase):
 
 
 @mark.django_db
-class TestXblockSkills(TestCase):
+class TestXBlockSkills(TestCase):
     """
-    Tests for the ``XblockSkills`` model.
+    Tests for the ``XBlockSkills`` model.
     """
 
     def test_xblock_skill_string_representation(self):
         """
-        Test the string representation of the XblockSkills model.
+        Test the string representation of the XBlockSkills model.
         """
-        xblock_skill_through = factories.XblockSkillThroughFactory()
+        xblock_skill_through = factories.XBlockSkillThroughFactory()
         xblock_skills = xblock_skill_through.xblock
-        expected_str = '<XblockSkills usage_key="{}">'.format(
+        expected_str = '<XBlockSkills usage_key="{}">'.format(
             xblock_skills.usage_key
         )
-        expected_repr = '<XblockSkills id="{0}">'.format(xblock_skills.id)
+        expected_repr = '<XBlockSkills id="{0}">'.format(xblock_skills.id)
 
         assert expected_str == xblock_skills.__str__()
         assert expected_repr == xblock_skills.__repr__()
 
     def test_xblock_skill_through_string_representation(self):
         """
-        Test the string representation of the XblockSkillThrough model.
+        Test the string representation of the XBlockSkillThrough model.
         """
-        xblock_skill_through = factories.XblockSkillThroughFactory()
-        expected_str = '<XblockSkillThrough usage_key="{}" skill="{}" verified="{}">'.format(
+        xblock_skill_through = factories.XBlockSkillThroughFactory()
+        expected_str = '<XBlockSkillThrough usage_key="{}" skill="{}" verified="{}">'.format(
             xblock_skill_through.xblock.usage_key,
             xblock_skill_through.skill.name,
             xblock_skill_through.verified,
         )
-        expected_repr = '<XblockSkillThrough id="{0}">'.format(xblock_skill_through.id)
+        expected_repr = '<XBlockSkillThrough id="{0}">'.format(xblock_skill_through.id)
 
         assert expected_str == xblock_skill_through.__str__()
         assert expected_repr == xblock_skill_through.__repr__()

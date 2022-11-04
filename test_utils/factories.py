@@ -11,7 +11,7 @@ from faker import Faker
 
 from taxonomy.models import (
     CourseSkills, Job, JobPostings, JobSkills, Skill, Translation, SkillCategory, SkillSubCategory, ProgramSkill,
-    SkillsQuiz, RefreshCourseSkillsConfig, RefreshProgramSkillsConfig, Industry, XblockSkillThrough, XblockSkills
+    SkillsQuiz, RefreshCourseSkillsConfig, RefreshProgramSkillsConfig, Industry, XBlockSkillThrough, XBlockSkills
 )
 from taxonomy.choices import UserGoal
 
@@ -117,38 +117,38 @@ class SkillFactory(factory.django.DjangoModelFactory):
 
 
 # pylint: disable=no-member
-class XblockSkillsFactory(factory.django.DjangoModelFactory):
+class XBlockSkillsFactory(factory.django.DjangoModelFactory):
     """
-    Factory class for XblockSkills model.
+    Factory class for XBlockSkills model.
     """
 
     class Meta:
         """
-        Meta for ``XblockSkillsFactory``.
+        Meta for ``XBlockSkillsFactory``.
         """
 
-        model = XblockSkills
+        model = XBlockSkills
         django_get_or_create = ('usage_key',)
 
     usage_key = factory.LazyAttribute(lambda x: FAKER.slug())
 
 
 # pylint: disable=no-member
-class XblockSkillThroughFactory(factory.django.DjangoModelFactory):
+class XBlockSkillThroughFactory(factory.django.DjangoModelFactory):
     """
-    Factory class for XblockSkills model.
+    Factory class for XBlockSkills model.
     """
 
     class Meta:
         """
-        Meta for ``XblockSkillsFactory``.
+        Meta for ``XBlockSkillsFactory``.
         """
 
-        model = XblockSkillThrough
+        model = XBlockSkillThrough
         django_get_or_create = ('xblock', 'skill')
 
     skill = factory.SubFactory(SkillFactory)
-    xblock = factory.SubFactory(XblockSkillsFactory)
+    xblock = factory.SubFactory(XBlockSkillsFactory)
     confidence = factory.LazyAttribute(lambda x: FAKER.pyfloat(min_value=0, max_value=1))
     is_blacklisted = False
 
