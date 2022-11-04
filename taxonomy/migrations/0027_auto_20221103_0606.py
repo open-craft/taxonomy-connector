@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='XblockSkills',
+            name='XBlockSkills',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
@@ -24,13 +24,13 @@ class Migration(migrations.Migration):
                 ('auto_processed', models.BooleanField(default=False, help_text='Indicates whether the text from this block was already processed')),
             ],
             options={
-                'verbose_name': 'Xblock Skills',
-                'verbose_name_plural': 'Xblock Skills',
+                'verbose_name': 'XBlock Skills',
+                'verbose_name_plural': 'XBlock Skills',
                 'ordering': ('created',),
             },
         ),
         migrations.CreateModel(
-            name='XblockSkillThrough',
+            name='XBlockSkillThrough',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
@@ -53,6 +53,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='xblockskills',
             name='skills',
-            field=models.ManyToManyField(help_text='The ID of the skill extracted for the xblock.', through='taxonomy.XblockSkillThrough', to='taxonomy.Skill'),
+            field=models.ManyToManyField(help_text='The ID of the skill extracted for the xblock.', through='taxonomy.XBlockSkillThrough', to='taxonomy.Skill'),
         ),
     ]

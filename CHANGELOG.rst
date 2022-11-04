@@ -15,7 +15,7 @@ Unreleased
 
 [1.27.0] - 2022-11-03
 ---------------------
-* Added XblockSkills and XblockSkillThrough models.
+* Added XBlockSkills and XBlockSkillThrough models.
 
 [1.26.0] - 2022-10-31
 ---------------------
