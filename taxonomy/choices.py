@@ -22,5 +22,5 @@ class ProductTypes(DjangoChoices):
 
     Course = ChoiceItem('course', 'Course')
     Program = ChoiceItem('program', 'Program')
-    Xblock = ChoiceItem('xblock', 'Xblock')
-    XblockThrough = ChoiceItem('xblock_through', 'XblockThrough')
+    XBlock = ChoiceItem('xblock', 'XBlock')
+    XBlockThrough = ChoiceItem('xblock_through', 'XBlockThrough')

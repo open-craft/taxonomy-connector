@@ -7,7 +7,7 @@ All host platform must run this validator to make sure providers are working as 
 from taxonomy.providers.utils import get_xblock_metadata_provider
 
 
-class XblockMetadataProviderValidator:
+class XBlockMetadataProviderValidator:
     """
     Validate that the interface requirement for xblock metadata provider matches with the implementation.
     """
@@ -25,7 +25,7 @@ class XblockMetadataProviderValidator:
 
     def validate(self):
         """
-        Validate XblockMetadataProvider implements the interface as expected.
+        Validate XBlockMetadataProvider implements the interface as expected.
 
         Note: This is the only method that host platform will call,
         this method is responsible for calling the rest of the validation functions.

@@ -61,6 +61,6 @@ def update_xblock_skills(xblock_uuids):
     LOGGER.info('[TAXONOMY] refresh_xblock_skills task triggered')
     xblocks = get_xblock_metadata_provider().get_xblocks(xblock_ids=xblock_uuids)
     if xblocks:
-        utils.refresh_product_skills(xblocks, True, ProductTypes.Xblock)
+        utils.refresh_product_skills(xblocks, True, ProductTypes.XBlock)
     else:
         LOGGER.warning('[TAXONOMY] No xblock found with uuids [%d] to update skills.', xblock_uuids)
