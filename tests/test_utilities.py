@@ -14,10 +14,10 @@ from taxonomy import models, utils
 from taxonomy.choices import ProductTypes
 from taxonomy.constants import ENGLISH
 from taxonomy.exceptions import TaxonomyAPIError
-from taxonomy.models import CourseSkills, JobSkills, Skill, Translation
+from taxonomy.models import CourseSkills, JobSkills, Skill, Translation, XBlockSkills
 from test_utils import factories
 from test_utils.constants import COURSE_KEY, PROGRAM_UUID, USAGE_KEY
-from test_utils.mocks import MockCourse, MockProgram
+from test_utils.mocks import MockCourse, MockProgram, MockXBlock
 from test_utils.sample_responses.skills import SKILLS_EMSI_CLIENT_RESPONSE
 from test_utils.testcase import TaxonomyTestCase
 
@@ -235,7 +235,7 @@ class TestUtils(TaxonomyTestCase):
                 'type_name': black_listed_xblock_skill.skill.type_name,
                 'description': black_listed_xblock_skill.skill.description
             },
-            product_type=product_type
+            product_type=product_type,
         )
 
         updated_name = 'new_name'
@@ -243,6 +243,7 @@ class TestUtils(TaxonomyTestCase):
         updated_type_id = '1'
         updated_type_name = 'new_type'
         updated_description = 'new description'
+        hash_content = "xyz"
         skill_data = {
             'name': updated_name,
             'info_url': updated_info_url,
@@ -255,11 +256,18 @@ class TestUtils(TaxonomyTestCase):
             skill_external_id=self.skill.external_id,
             confidence=0.9,
             skill_data=skill_data,
-            product_type=product_type
+            product_type=product_type,
+            hash_content=hash_content,
         )
 
         # make sure no new `Skill` object created.
         assert Skill.objects.count() == skills_count
+
+        # make sure hash_content is stored properly
+        assert XBlockSkills.objects.filter(
+            usage_key=USAGE_KEY,
+            hash_content=hash_content,
+        ).exists()
 
         # Make sure `XBlockSkills` is not removed from the blacklist.
         assert utils.is_skill_blacklisted(
@@ -760,6 +768,64 @@ class TestUtils(TaxonomyTestCase):
         assert new_course_description == expected_translated_description
         assert translation_record.translated_text == new_course_description
         assert translate_mocked.call_count == 3
+
+    def test_process_skill_attr(self):
+        """
+        validate process_skill_attr returns correct data and flag
+        """
+        text = "some text"
+        xblock = factories.XBlockSkillsFactory(usage_key=USAGE_KEY)
+        extra_data, skip = utils.process_skill_attr(text, USAGE_KEY, ProductTypes.XBlock)
+        # xblock with new text should not skip.
+        assert not skip
+        assert "hash_content" in extra_data
+        xblock.hash_content = extra_data["hash_content"]
+        xblock.auto_processed = True
+        xblock.save()
+
+        # xblock with same content should skip processing.
+        extra_data, skip = utils.process_skill_attr(text, USAGE_KEY, ProductTypes.XBlock)
+        assert skip
+
+    @mock.patch('taxonomy.utils.EMSISkillsApiClient.get_product_skills')
+    @mock.patch('taxonomy.utils.get_translated_skill_attribute_val')
+    def test_refresh_xblock_skills_no_change_skipped(
+            self,
+            get_translated_description_mock,
+            get_xblock_skills_mock
+    ):
+        """
+        Validate that `refresh_product_skills` rate limits API calls to EMSI.
+        """
+        get_xblock_skills_mock.return_value = SKILLS_EMSI_CLIENT_RESPONSE
+        get_translated_description_mock.return_value = None
+        product_type = ProductTypes.XBlock
+
+        xblocks = []
+        xblock = MockXBlock()
+        for _ in range(3):
+            xblocks.append({
+                'key': xblock.key,
+                'content_type': xblock.content_type,
+                'content': xblock.content,
+            })
+
+        utils.refresh_product_skills(xblocks, True, product_type)
+
+        assert get_translated_description_mock.call_count == 0
+        # it should be processed only once as the same content for same xblock
+        # is passed multiple times
+        assert get_xblock_skills_mock.call_count == 1
+
+        # changed content should trigger processing
+        new_data = [{
+            'key': xblock.key,
+            'content_type': xblock.content_type,
+            'content': MockXBlock().content,
+        }]
+
+        utils.refresh_product_skills(new_data, True, product_type)
+        assert get_xblock_skills_mock.call_count == 2
 
     @mock.patch('taxonomy.utils.EMSISkillsApiClient.get_product_skills')
     @mock.patch('taxonomy.utils.get_translated_skill_attribute_val')
