@@ -15,7 +15,7 @@ class XBlockMetadataProvider:
     """
 
     @abstractmethod
-    def get_xblocks(self, xblock_ids):
+    def get_xblocks(self, xblock_ids: list):
         """
         Get a list of xblocks matching the xblock ids provided in the argument.
         Include content of all children xblocks in content
@@ -32,9 +32,9 @@ class XBlockMetadataProvider:
         """
 
     @abstractmethod
-    def get_all_xblocks(self):
+    def get_all_xblocks_in_course(self, course_id: str):
         """
-        Get iterator for all the xblocks.
+        Get iterator for all the unit/video xblocks in course.
 
         Returns:
           iterator<dict>: An iterator of xblocks in the form of dictionary.
