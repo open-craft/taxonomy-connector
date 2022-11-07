@@ -129,6 +129,12 @@ class XBlockSkills(TimeStampedModel):
         default=False,
         help_text=_('Indicates whether the text from this block was already processed'),
     )
+    hash_content = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_('Hashed text content useful for checking if content has changed')
+    )
 
     class Meta:
         """
