@@ -117,9 +117,9 @@ class DiscoveryXBlockMetadataProvider(XBlockMetadataProvider):
             'content': xblock.content,
         } for xblock in xblocks]
 
-    def get_all_xblocks(self):
+    def get_all_xblocks_in_course(self, course_id: str):
         """
-        Get iterator of all the xblocks
+        Get iterator for all the unit/video xblocks in course.
         """
         if self.mock_xblocks is not None:
             xblocks = self.mock_xblocks
