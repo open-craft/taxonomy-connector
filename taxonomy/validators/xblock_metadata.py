@@ -31,7 +31,7 @@ class XBlockMetadataProviderValidator:
         this method is responsible for calling the rest of the validation functions.
         """
         self.validate_get_xblocks()
-        self.validate_get_all_xblocks()
+        self.validate_get_all_xblocks_in_course()
 
     def validate_get_xblocks(self):
         """
@@ -46,11 +46,11 @@ class XBlockMetadataProviderValidator:
             assert 'content' in xblock
             assert 'content_type' in xblock
 
-    def validate_get_all_xblocks(self):
+    def validate_get_all_xblocks_in_course(self):
         """
-        Validate `get_all_xblocks` methods has the correct interface implemented.
+        Validate `get_all_xblocks_in_course` methods has the correct interface implemented.
         """
-        xblocks = self.xblock_metadata_provider.get_all_xblocks()
+        xblocks = self.xblock_metadata_provider.get_all_xblocks_in_course("dummy-course-id")
 
         for xblock in xblocks:
             assert 'key' in xblock
