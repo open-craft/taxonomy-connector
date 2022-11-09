@@ -769,13 +769,14 @@ class TestUtils(TaxonomyTestCase):
         assert translation_record.translated_text == new_course_description
         assert translate_mocked.call_count == 3
 
-    def test_process_skill_attr(self):
+    def test_process_skill_attr_text(self):
         """
-        validate process_skill_attr returns correct data and flag
+        validate process_skill_attr_text and skip_product_processing returns correct data and flag
         """
         text = "some text"
         xblock = factories.XBlockSkillsFactory(usage_key=USAGE_KEY)
-        extra_data, skip = utils.process_skill_attr(text, USAGE_KEY, ProductTypes.XBlock)
+        extra_data = utils.process_skill_attr_text(text, ProductTypes.XBlock)
+        skip = utils.skip_product_processing(extra_data, USAGE_KEY, ProductTypes.XBlock)
         # xblock with new text should not skip.
         assert not skip
         assert "hash_content" in extra_data
@@ -784,7 +785,8 @@ class TestUtils(TaxonomyTestCase):
         xblock.save()
 
         # xblock with same content should skip processing.
-        extra_data, skip = utils.process_skill_attr(text, USAGE_KEY, ProductTypes.XBlock)
+        extra_data = utils.process_skill_attr_text(text, ProductTypes.XBlock)
+        skip = utils.skip_product_processing(extra_data, USAGE_KEY, ProductTypes.XBlock)
         assert skip
 
     @mock.patch('taxonomy.utils.EMSISkillsApiClient.get_product_skills')
