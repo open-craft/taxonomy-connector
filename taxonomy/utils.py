@@ -21,7 +21,7 @@ from taxonomy.constants import (
 )
 from taxonomy.emsi.client import EMSISkillsApiClient
 from taxonomy.exceptions import TaxonomyAPIError
-from taxonomy.models import CourseSkills, ProgramSkill, JobSkills, Skill, Translation, XBlockSkillThrough, XBlockSkills
+from taxonomy.models import CourseSkills, ProgramSkill, JobSkills, Skill, Translation, XBlockSkillData, XBlockSkills
 from taxonomy.serializers import SkillSerializer
 
 LOGGER = logging.getLogger(__name__)
@@ -88,7 +88,7 @@ def get_product_skill_model_and_identifier(product_type):
     if product_type == ProductTypes.XBlock:
         return (XBlockSkills, 'usage_key')
     if product_type == ProductTypes.XBlockThrough:
-        return (XBlockSkillThrough, 'xblock_id')
+        return (XBlockSkillData, 'xblock_id')
     return (CourseSkills, 'course_key')
 
 
