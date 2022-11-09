@@ -96,12 +96,11 @@ class TestXBlockSkills(TestCase):
     Tests for the ``XBlockSkills`` model.
     """
 
-    def test_xblock_skill_string_representation(self):
+    def test_string_representation(self):
         """
         Test the string representation of the XBlockSkills model.
         """
-        xblock_skill_through = factories.XBlockSkillThroughFactory()
-        xblock_skills = xblock_skill_through.xblock
+        xblock_skills = factories.XBlockSkillsFactory()
         expected_str = '<XBlockSkills usage_key="{}">'.format(
             xblock_skills.usage_key
         )
@@ -110,17 +109,24 @@ class TestXBlockSkills(TestCase):
         assert expected_str == xblock_skills.__str__()
         assert expected_repr == xblock_skills.__repr__()
 
-    def test_xblock_skill_through_string_representation(self):
+
+@mark.django_db
+class TestXBlockSkillData(TestCase):
+    """
+    Tests for the ``XBlockSkillData`` model.
+    """
+
+    def test_string_representation(self):
         """
-        Test the string representation of the XBlockSkillThrough model.
+        Test the string representation of the XBlockSkillData model.
         """
-        xblock_skill_through = factories.XBlockSkillThroughFactory()
-        expected_str = '<XBlockSkillThrough usage_key="{}" skill="{}" verified="{}">'.format(
+        xblock_skill_through = factories.XBlockSkillDataFactory()
+        expected_str = '<XBlockSkillData usage_key="{}" skill="{}" verified="{}">'.format(
             xblock_skill_through.xblock.usage_key,
             xblock_skill_through.skill.name,
             xblock_skill_through.verified,
         )
-        expected_repr = '<XBlockSkillThrough id="{0}">'.format(xblock_skill_through.id)
+        expected_repr = '<XBlockSkillData id="{0}">'.format(xblock_skill_through.id)
 
         assert expected_str == xblock_skill_through.__str__()
         assert expected_repr == xblock_skill_through.__repr__()

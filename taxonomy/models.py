@@ -116,7 +116,7 @@ class XBlockSkills(TimeStampedModel):
     )
     skills = models.ManyToManyField(
         Skill,
-        through="XBlockSkillThrough",
+        through="XBlockSkillData",
         help_text=_(
             'The ID of the skill extracted for the xblock.'
         )
@@ -159,7 +159,7 @@ class XBlockSkills(TimeStampedModel):
         return '<XBlockSkills id="{0}">'.format(self.id)
 
 
-class XBlockSkillThrough(TimeStampedModel):
+class XBlockSkillData(TimeStampedModel):
     """
     Skills that will be learnt by completing xblock.
 
@@ -198,8 +198,8 @@ class XBlockSkillThrough(TimeStampedModel):
         Meta configuration for CourseSkills model.
         """
 
-        verbose_name = 'Tagged item'
-        verbose_name_plural = 'Tagged items'
+        verbose_name = 'Xblock Skill data'
+        verbose_name_plural = 'Xblock Skill data'
         ordering = ('created', )
         app_label = 'taxonomy'
         unique_together = ('xblock', 'skill')
@@ -208,7 +208,7 @@ class XBlockSkillThrough(TimeStampedModel):
         """
         Create a human-readable string representation of the object.
         """
-        return '<XBlockSkillThrough usage_key="{}" skill="{}" verified="{}">'.format(
+        return '<XBlockSkillData usage_key="{}" skill="{}" verified="{}">'.format(
             self.xblock.usage_key,
             self.skill.name,
             self.verified,
@@ -218,7 +218,7 @@ class XBlockSkillThrough(TimeStampedModel):
         """
         Create a unique string representation of the object.
         """
-        return '<XBlockSkillThrough id="{0}">'.format(self.id)
+        return '<XBlockSkillData id="{0}">'.format(self.id)
 
 
 class CourseSkills(TimeStampedModel):

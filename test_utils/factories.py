@@ -11,7 +11,7 @@ from faker import Faker
 
 from taxonomy.models import (
     CourseSkills, Job, JobPostings, JobSkills, Skill, Translation, SkillCategory, SkillSubCategory, ProgramSkill,
-    SkillsQuiz, RefreshCourseSkillsConfig, RefreshProgramSkillsConfig, Industry, XBlockSkillThrough, XBlockSkills
+    SkillsQuiz, RefreshCourseSkillsConfig, RefreshProgramSkillsConfig, Industry, XBlockSkillData, XBlockSkills
 )
 from taxonomy.choices import UserGoal
 
@@ -134,7 +134,7 @@ class XBlockSkillsFactory(factory.django.DjangoModelFactory):
 
 
 # pylint: disable=no-member
-class XBlockSkillThroughFactory(factory.django.DjangoModelFactory):
+class XBlockSkillDataFactory(factory.django.DjangoModelFactory):
     """
     Factory class for XBlockSkills model.
     """
@@ -144,7 +144,7 @@ class XBlockSkillThroughFactory(factory.django.DjangoModelFactory):
         Meta for ``XBlockSkillsFactory``.
         """
 
-        model = XBlockSkillThrough
+        model = XBlockSkillData
         django_get_or_create = ('xblock', 'skill')
 
     skill = factory.SubFactory(SkillFactory)
