@@ -3,7 +3,6 @@ Utils for taxonomy.
 """
 import logging
 import time
-from typing import Tuple
 import boto3
 
 from bs4 import BeautifulSoup
@@ -198,27 +197,39 @@ def get_hash(text_data: str):
     return hashlib.md5(processed_text.encode()).hexdigest()
 
 
-def process_skill_attr(text_data, key_or_uuid, product_type) -> Tuple[dict, bool]:
+def process_skill_attr_text(text_data: str, product_type: ProductTypes) -> dict:
     """
-    Return metadata for text_data as well as check whether to skip processing.
+    Return metadata for text_data.
     """
     extra_data = {}
+    if product_type == ProductTypes.XBlock:
+        hash_content = get_hash(text_data)
+        if hash_content:
+            extra_data["hash_content"] = hash_content
+    return extra_data
+
+
+def skip_product_processing(extra_data: dict, key_or_uuid: str, product_type: ProductTypes) -> bool:
+    """
+    Check whether to skip processing.
+    """
+    # currently only xblock text is checked
     if product_type != ProductTypes.XBlock:
-        return extra_data, False
-    hash_content = get_hash(text_data)
-    if not hash_content:
-        return extra_data, True
-    extra_data["hash_content"] = hash_content
+        return False
+
+    if not extra_data:
+        return True
     model, identifier = get_product_skill_model_and_identifier(product_type)
     skill_filter = {
         identifier: key_or_uuid,
-        "hash_content": hash_content,
         "auto_processed": True,
     }
+    skill_filter.update(extra_data)
     no_change = model.objects.filter(**skill_filter).exists()
     if no_change:
-        return extra_data, True
-    return extra_data, False
+        # text with same hash exists, so skip further processing
+        return True
+    return False
 
 
 def refresh_product_skills(products, should_commit_to_db, product_type):
@@ -238,9 +249,9 @@ def refresh_product_skills(products, should_commit_to_db, product_type):
         else:
             skill_attr_val = product[skill_extraction_attr]
         if skill_attr_val:
-            # check if request should be processed as well as pass additional data
-            extra_data, skip = process_skill_attr(skill_attr_val, product[key_or_uuid], product_type)
-            if skip:
+            # get metadata of skill_attr_val
+            extra_data = process_skill_attr_text(skill_attr_val, product_type)
+            if skip_product_processing(extra_data, product[key_or_uuid], product_type):
                 skipped_count += 1
                 continue
             # TODO: Skip translation for xblock text till we find better way to
