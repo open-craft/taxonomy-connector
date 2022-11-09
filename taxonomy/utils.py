@@ -83,18 +83,30 @@ def get_product_skill_model_and_identifier(product_type):
     """
     Return the Skill Model along with its identifier based on product type.
     """
+    product_skill = (CourseSkills, 'course_key')
     if product_type == ProductTypes.Program:
-        return (ProgramSkill, 'program_uuid')
-    if product_type == ProductTypes.XBlock:
-        return (XBlockSkills, 'usage_key')
-    if product_type == ProductTypes.XBlockThrough:
-        return (XBlockSkillData, 'xblock_id')
-    return (CourseSkills, 'course_key')
+        product_skill = (ProgramSkill, 'program_uuid')
+    elif product_type == ProductTypes.XBlock:
+        product_skill = (XBlockSkills, 'usage_key')
+    elif product_type == ProductTypes.XBlockThrough:
+        product_skill = (XBlockSkillData, 'xblock_id')
+    return product_skill
 
 
 def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, product_type, **kwargs):
     """
     Persist the skills data in the database for Program, Course or XBlock.
+
+    Args:
+        key_or_uuid (str): key or uuid of the object whose skill is to be updated.
+        skill_external_id (str): id from external api
+        confidence (float): confidence from external api
+        skill_data (dict): data from external api about the skill
+        product_type (ProductTypes): type of product
+        **kwargs: It should contain `hash_content` in case the product_type is XBlockSkills
+
+    Returns:
+
     """
     skill, _ = Skill.objects.update_or_create(external_id=skill_external_id, defaults=skill_data)
     if product_type == ProductTypes.XBlock:
@@ -108,9 +120,9 @@ def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, p
     if is_skill_blacklisted(key_or_uuid, skill.id, product_type):
         return
     skill_model, identifier = get_product_skill_model_and_identifier(product_type)
-    kwargs = {identifier: key_or_uuid, "skill": skill}
+    condition = {identifier: key_or_uuid, "skill": skill}
     defaults = {"confidence": confidence}
-    _, created = skill_model.objects.update_or_create(**kwargs, defaults=defaults)
+    _, created = skill_model.objects.update_or_create(**condition, defaults=defaults)
     action = 'created' if created else 'updated'
     LOGGER.info(f'{skill_model} {action} for key {key_or_uuid}')
 
@@ -158,11 +170,12 @@ def get_translation_attr(product_type):
     """
     Return properties based on product type.
     """
+    translation_attr = COURSE_METADATA_FIELDS_COMBINED
     if product_type == ProductTypes.Program:
-        return 'overview'
-    if product_type == ProductTypes.XBlock:
-        return 'content'
-    return COURSE_METADATA_FIELDS_COMBINED
+        translation_attr = 'overview'
+    elif product_type == ProductTypes.XBlock:
+        translation_attr = 'content'
+    return translation_attr
 
 
 def get_course_metadata_fields_text(course_attrs_string, course):
@@ -175,16 +188,19 @@ def get_course_metadata_fields_text(course_attrs_string, course):
     return ' '.join(filter(bool, course_attr_values)).strip()
 
 
-def get_hash(text_data):
+def get_hash(text_data: str):
     """
     Return hash for given text_data.
     """
-    return hashlib.md5(text_data.replace(" ", "").encode()).hexdigest()
+    processed_text = text_data.replace(" ", "")
+    if not processed_text:
+        return None
+    return hashlib.md5(processed_text.encode()).hexdigest()
 
 
 def process_skill_attr(text_data, key_or_uuid, product_type) -> Tuple[dict, bool]:
     """
-    Return additional data for skill_attr_val as well as check whether to skip processing.
+    Return metadata for text_data as well as check whether to skip processing.
     """
     extra_data = {}
     if product_type != ProductTypes.XBlock:
@@ -194,11 +210,12 @@ def process_skill_attr(text_data, key_or_uuid, product_type) -> Tuple[dict, bool
         return extra_data, True
     extra_data["hash_content"] = hash_content
     model, identifier = get_product_skill_model_and_identifier(product_type)
-    no_change = model.objects.filter(**{
+    skill_filter = {
         identifier: key_or_uuid,
         "hash_content": hash_content,
         "auto_processed": True,
-    }).exists()
+    }
+    no_change = model.objects.filter(**skill_filter).exists()
     if no_change:
         return extra_data, True
     return extra_data, False
@@ -317,7 +334,7 @@ def is_skill_blacklisted(key_or_uuid, skill_id, product_type):
     Return the black listed status of a course or program skill.
 
     Arguments:
-        key_or_uuid: CourseKey or ProgramUUID object pointing to the course or program whose skill need to be checked.
+        key_or_uuid: CourseKey, UsageKey or ProgramUUID object whose skill need to be checked.
         skill_id (int): Primary key identifier of the skill that need to be checked.
         is_programs(bool): Boolean indicating which Skill Model would be selected.
 

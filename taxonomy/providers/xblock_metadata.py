@@ -24,7 +24,7 @@ class XBlockMetadataProvider:
           xblock_ids(list<str>): A list of UUIDs in the form of a string.
 
         Returns:
-          list<dict>: A list of xblocks in the form of dictionary.
+          list<dict>: A list of xblocks dictionary.
             Dictionary object must have the following keys
             1. key: xblock usage key
             2. content_type: xblock content type
@@ -37,7 +37,7 @@ class XBlockMetadataProvider:
         Get iterator for all the unit/video xblocks in course.
 
         Returns:
-          iterator<dict>: An iterator of xblocks in the form of dictionary.
+          iterator<dict>: An iterator of xblocks dictionary.
             Dictionary object must have the following keys
             1. key: xblock usage key
             2. content_type: xblock content type
