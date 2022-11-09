@@ -221,7 +221,7 @@ class TestUtils(TaxonomyTestCase):
         Validate that update_xblock_skills_data works as expected.
         """
         xblock = factories.XBlockSkillsFactory(usage_key=USAGE_KEY)
-        black_listed_xblock_skill = factories.XBlockSkillThroughFactory(xblock=xblock, is_blacklisted=True)
+        black_listed_xblock_skill = factories.XBlockSkillDataFactory(xblock=xblock, is_blacklisted=True)
         skills_count = Skill.objects.count()
         product_type = ProductTypes.XBlock
         utils.update_skills_data(
@@ -275,7 +275,7 @@ class TestUtils(TaxonomyTestCase):
             black_listed_xblock_skill.skill.id,
             ProductTypes.XBlockThrough,
         ) is True
-        xblock_skill = models.XBlockSkillThrough.objects.get(
+        xblock_skill = models.XBlockSkillData.objects.get(
             xblock=xblock,
             skill=black_listed_xblock_skill.skill,
         )
@@ -283,7 +283,7 @@ class TestUtils(TaxonomyTestCase):
 
         # Make sure that skill that was not black listed is added with no issues.
         assert utils.is_skill_blacklisted(xblock.id, self.skill.id, ProductTypes.XBlockThrough) is False
-        assert models.XBlockSkillThrough.objects.filter(
+        assert models.XBlockSkillData.objects.filter(
             xblock=xblock,
             skill=self.skill,
             is_blacklisted=False,
