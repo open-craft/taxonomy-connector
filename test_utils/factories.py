@@ -135,7 +135,7 @@ class XBlockSkillsFactory(factory.django.DjangoModelFactory):
 
 
 # pylint: disable=no-member
-class XBlockSkillThroughFactory(factory.django.DjangoModelFactory):
+class XBlockSkillDataFactory(factory.django.DjangoModelFactory):
     """
     Factory class for XBlockSkills model.
     """
@@ -145,7 +145,7 @@ class XBlockSkillThroughFactory(factory.django.DjangoModelFactory):
         Meta for ``XBlockSkillsFactory``.
         """
 
-        model = XBlockSkillThrough
+        model = XBlockSkillData
         django_get_or_create = ('xblock', 'skill')
 
     skill = factory.SubFactory(SkillFactory)
