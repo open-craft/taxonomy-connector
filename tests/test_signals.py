@@ -52,7 +52,7 @@ class TaxonomyTasksTests(unittest.TestCase):
         Verify that `UPDATE_PROGRAM_SKILLS` signal work as expected.
         """
         get_product_skills_mock.return_value = self.skills_emsi_client_response
-        get_program_provider_mock.return_value = DiscoveryProgramMetadataProvider([self.course])
+        get_program_provider_mock.return_value = DiscoveryProgramMetadataProvider([self.program])
 
         # verify that no `Skill` and `ProgramSkill` records exist before executing the task
         skill = Skill.objects.all()

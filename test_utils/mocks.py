@@ -24,7 +24,7 @@ class MockCourse(MagicMock):
         """
         Initialize course related attributes.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, spec=dict, **kwargs)
 
         self.uuid = uuid if uuid is not DEFAULT else uuid4()
         self.key = key if key is not DEFAULT else 'course-id/{}'.format(FAKER.slug())
@@ -44,7 +44,7 @@ class MockProgram(MagicMock):
         """
         Initialize program related attributes.
         """
-        super(MockProgram, self).__init__(*args, **kwargs)
+        super(MockProgram, self).__init__(*args, spec=dict, **kwargs)
 
         self.uuid = uuid if uuid is not DEFAULT else uuid4()
         self.title = title if title is not DEFAULT else 'Test Program {}'.format(FAKER.sentence())
@@ -63,8 +63,16 @@ class MockXBlock(MagicMock):
         """
         Initialize course related attributes.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, spec=dict, **kwargs)
 
         self.key = key if key is not DEFAULT else 'xblock-id/{}'.format(FAKER.slug())
         self.content_type = content_type if content_type is not DEFAULT else 'Video'
         self.content = content if content is not DEFAULT else FAKER.sentence(nb_words=50)
+
+
+def mock_as_dict(mock_obj):
+    """
+    Returns a mock object which behaves like dictionary.
+    """
+    mock_obj.__getitem__.side_effect = mock_obj.__dict__.__getitem__
+    return mock_obj
