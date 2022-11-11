@@ -17,7 +17,7 @@ from taxonomy.exceptions import TaxonomyAPIError
 from taxonomy.models import CourseSkills, JobSkills, Skill, Translation, XBlockSkills
 from test_utils import factories
 from test_utils.constants import COURSE_KEY, PROGRAM_UUID, USAGE_KEY
-from test_utils.mocks import MockCourse, MockProgram, MockXBlock
+from test_utils.mocks import MockCourse, MockProgram, MockXBlock, mock_as_dict
 from test_utils.sample_responses.skills import SKILLS_EMSI_CLIENT_RESPONSE
 from test_utils.testcase import TaxonomyTestCase
 
@@ -804,7 +804,7 @@ class TestUtils(TaxonomyTestCase):
         product_type = ProductTypes.XBlock
 
         xblocks = []
-        xblock = MockXBlock()
+        xblock = mock_as_dict(MockXBlock())
         for _ in range(3):
             xblocks.append({
                 'key': xblock.key,
@@ -823,7 +823,7 @@ class TestUtils(TaxonomyTestCase):
         new_data = [{
             'key': xblock.key,
             'content_type': xblock.content_type,
-            'content': MockXBlock().content,
+            'content': mock_as_dict(MockXBlock()).content,
         }]
 
         utils.refresh_product_skills(new_data, True, product_type)
@@ -848,7 +848,7 @@ class TestUtils(TaxonomyTestCase):
 
         courses = []
         for _ in range(11):
-            course = MockCourse()
+            course = mock_as_dict(MockCourse())
             courses.append({
                 'uuid': course.uuid,
                 'key': course.key,
@@ -866,7 +866,7 @@ class TestUtils(TaxonomyTestCase):
         """
         Validate that `refresh_skills` shows skipped_programs_count properly.
         """
-        program = MockProgram()
+        program = mock_as_dict(MockProgram())
         overview = {'overview': None, 'uuid': program.uuid}
         program.__getitem__.side_effect = overview.__getitem__
         assert program['overview'] is None
@@ -877,53 +877,64 @@ class TestUtils(TaxonomyTestCase):
             messages = [record.msg for record in log_capture.records]
             self.assertIn('Total %s Skipped: %s', messages[0])
 
+    @mock.patch('taxonomy.utils.translate_text')
     @mock.patch('taxonomy.utils.EMSISkillsApiClient.get_product_skills')
-    def test_refresh_program_skills_api_error(self, mock_emsi_skills_data):
+    def test_refresh_program_skills_api_error(self, mock_emsi_skills_data, mock_translate):
         """
         Validate that `refresh_program_skills` handles TaxonomyAPIError
         """
         mock_emsi_skills_data.side_effect = TaxonomyAPIError
-        program = MockProgram()
+        mock_translate.return_value = {'SourceLanguageCode': '', 'TranslatedText': ''}
+        program = mock_as_dict(MockProgram())
 
         with LogCapture(level=logging.INFO) as log_capture:
-            utils.refresh_product_skills([program], False, True)
+            utils.refresh_product_skills([program], False, ProductTypes.Program)
             messages = [record.msg for record in log_capture.records]
             self.assertIn(f'[TAXONOMY] API Error for key: {program["uuid"]}', messages)
 
+    @mock.patch('taxonomy.utils.translate_text')
     @mock.patch('taxonomy.utils.process_skills_data')
     @mock.patch('taxonomy.utils.EMSISkillsApiClient.get_product_skills')
-    def test_refresh_program_skills_broad_exception(self, mock_emsi_skills_data, mock_skills_data):
+    def test_refresh_program_skills_broad_exception(
+            self,
+            mock_emsi_skills_data,
+            mock_skills_data,
+            mock_translate,
+    ):
         """
         Validate that `refresh_skills` handles broad exception.
         """
         mock_emsi_skills_data.return_value = SKILLS_EMSI_CLIENT_RESPONSE
         mock_skills_data.side_effect = Exception
-        program = MockProgram()
+        mock_translate.return_value = {'SourceLanguageCode': '', 'TranslatedText': ''}
+        program = mock_as_dict(MockProgram())
 
         with LogCapture(level=logging.INFO) as log_capture:
-            utils.refresh_product_skills([program], False, True)
+            utils.refresh_product_skills([program], False, ProductTypes.Program)
             messages = [record.msg for record in log_capture.records]
             self.assertIn(f'[TAXONOMY] Exception for key: {program["uuid"]} Error: ', messages)
 
+    @mock.patch('taxonomy.utils.translate_text')
     @mock.patch('taxonomy.utils.EMSISkillsApiClient.get_product_skills')
-    @mock.patch('time.sleep')
+    @mock.patch('time.sleep', return_value=None)
     def test_refresh_program_skills_rate_limit_emsi_api_calls(
             self,
             time_sleep_mock,
-            get_program_skills_mock
+            get_program_skills_mock,
+            mock_translate,
     ):
         """
         Validate that `refresh_program_skills` rate limits API calls to EMSI.
         """
         get_program_skills_mock.return_value = SKILLS_EMSI_CLIENT_RESPONSE
-        time_sleep_mock.return_value = None
+        mock_translate.return_value = {'SourceLanguageCode': '', 'TranslatedText': ''}
 
         programs = []
         for _ in range(11):
-            program = MockProgram()
+            program = mock_as_dict(MockProgram())
             programs.append(program)
 
-        utils.refresh_product_skills(programs, False, True)
+        utils.refresh_product_skills(programs, False, ProductTypes.Program)
 
         # it should be called after every 5 requests made to EMSI
         assert time_sleep_mock.call_count == 2
