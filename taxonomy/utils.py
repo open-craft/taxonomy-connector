@@ -87,7 +87,7 @@ def get_product_skill_model_and_identifier(product_type):
         product_skill = (ProgramSkill, 'program_uuid')
     elif product_type == ProductTypes.XBlock:
         product_skill = (XBlockSkills, 'usage_key')
-    elif product_type == ProductTypes.XBlockThrough:
+    elif product_type == ProductTypes.XBlockData:
         product_skill = (XBlockSkillData, 'xblock_id')
     return product_skill
 
@@ -110,7 +110,7 @@ def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, p
     skill, _ = Skill.objects.update_or_create(external_id=skill_external_id, defaults=skill_data)
     if product_type == ProductTypes.XBlock:
         x_model, x_identifier = get_product_skill_model_and_identifier(product_type)
-        product_type = ProductTypes.XBlockThrough
+        product_type = ProductTypes.XBlockData
         xblock, _ = x_model.objects.update_or_create(
             **{x_identifier: key_or_uuid},
             defaults={"hash_content": kwargs.get("hash_content"), "auto_processed": True},
