@@ -260,10 +260,10 @@ class TestUtils(TaxonomyTestCase):
             hash_content=hash_content,
         )
 
-        # make sure no new `Skill` object created.
+        # Make sure no new `Skill` object is created.
         assert Skill.objects.count() == skills_count
 
-        # make sure hash_content is stored properly
+        # Make sure hash_content is stored properly.
         assert XBlockSkills.objects.filter(
             usage_key=USAGE_KEY,
             hash_content=hash_content,
@@ -279,17 +279,17 @@ class TestUtils(TaxonomyTestCase):
             xblock=xblock,
             skill=black_listed_xblock_skill.skill,
         )
-        assert xblock_skill.is_blacklisted is True
+        assert xblock_skill.is_blacklisted
 
-        # Make sure that skill that was not black listed is added with no issues.
-        assert utils.is_skill_blacklisted(xblock.id, self.skill.id, ProductTypes.XBlockData) is False
+        # Make sure the skill that was not black listed is added with no issues.
+        assert not utils.is_skill_blacklisted(xblock.id, self.skill.id, ProductTypes.XBlockData)
         assert models.XBlockSkillData.objects.filter(
             xblock=xblock,
             skill=self.skill,
             is_blacklisted=False,
         ).exists()
 
-        # Make sure the `Skill` object updated
+        # Make sure the `Skill` object is updated
         self.skill.refresh_from_db()
         assert self.skill.name == skill_data.get('name')
         assert self.skill.info_url == skill_data.get('info_url')
@@ -771,13 +771,13 @@ class TestUtils(TaxonomyTestCase):
 
     def test_process_skill_attr_text(self):
         """
-        validate process_skill_attr_text and skip_product_processing returns correct data and flag
+        Validate process_skill_attr_text and skip_product_processing returns correct data and flag.
         """
         text = "some text"
         xblock = factories.XBlockSkillsFactory(usage_key=USAGE_KEY)
         extra_data = utils.process_skill_attr_text(text, ProductTypes.XBlock)
         skip = utils.skip_product_processing(extra_data, USAGE_KEY, ProductTypes.XBlock)
-        # xblock with new text should not skip.
+        # XBlock with new text should not skip.
         assert not skip
         assert "hash_content" in extra_data
         xblock.hash_content = extra_data["hash_content"]
