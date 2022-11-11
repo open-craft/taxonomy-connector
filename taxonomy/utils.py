@@ -3,6 +3,7 @@ Utils for taxonomy.
 """
 import logging
 import time
+from typing import Union
 import boto3
 
 from bs4 import BeautifulSoup
@@ -249,6 +250,18 @@ def skip_product_processing(extra_data: dict, key_or_uuid: str, product_type: Pr
     return False
 
 
+def _convert_product_to_dict(product: Union[dict, tuple]):
+    """
+    Convert product data to dict.
+    """
+    product_dict = None
+    if isinstance(product, dict):
+        product_dict = product
+    elif isinstance(product, tuple) and hasattr(product, "_asdict"):
+        product_dict = product._asdict()
+    return product_dict
+
+
 def refresh_product_skills(products, should_commit_to_db, product_type):
     """
     Refresh the skills associated with the provided products.
@@ -261,6 +274,10 @@ def refresh_product_skills(products, should_commit_to_db, product_type):
     client = EMSISkillsApiClient()
 
     for index, product in enumerate(products, start=1):
+        product = _convert_product_to_dict(product)
+        if product is None:
+            skipped_count += 1
+            continue
         if product_type == ProductTypes.Course:
             skill_attr_val = get_course_metadata_fields_text(skill_extraction_attr, product)
         else:
