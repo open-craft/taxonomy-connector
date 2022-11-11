@@ -5,6 +5,7 @@ Validator for xblock metadata provider.
 All host platform must run this validator to make sure providers are working as expected.
 """
 from taxonomy.providers.utils import get_xblock_metadata_provider
+from taxonomy.providers import XBlockContent
 
 
 class XBlockMetadataProviderValidator:
@@ -42,9 +43,7 @@ class XBlockMetadataProviderValidator:
         assert len(xblocks) == len(self.test_xblocks)
 
         for xblock in xblocks:
-            assert 'key' in xblock
-            assert 'content' in xblock
-            assert 'content_type' in xblock
+            assert isinstance(xblock, XBlockContent)
 
     def validate_get_all_xblocks_in_course(self):
         """
@@ -53,6 +52,4 @@ class XBlockMetadataProviderValidator:
         xblocks = self.xblock_metadata_provider.get_all_xblocks_in_course("dummy-course-id")
 
         for xblock in xblocks:
-            assert 'key' in xblock
-            assert 'content' in xblock
-            assert 'content_type' in xblock
+            assert isinstance(xblock, XBlockContent)

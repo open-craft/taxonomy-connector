@@ -5,6 +5,11 @@ Abstract base class for xblock metadata providers.
 All host platform must implement this provider in order for taxonomy to work.
 """
 from abc import abstractmethod
+from collections import namedtuple
+from typing import Iterator, List
+
+
+XBlockContent = namedtuple("XBlockContent", ["key", "content_type", "content"])
 
 
 class XBlockMetadataProvider:
@@ -15,7 +20,7 @@ class XBlockMetadataProvider:
     """
 
     @abstractmethod
-    def get_xblocks(self, xblock_ids: list):
+    def get_xblocks(self, xblock_ids: list) -> List[XBlockContent]:
         """
         Get a list of xblocks matching the xblock ids provided in the argument.
         Include content of all children xblocks in content
@@ -24,21 +29,21 @@ class XBlockMetadataProvider:
           xblock_ids(list<str>): A list of UUIDs in the form of a string.
 
         Returns:
-          list<dict>: A list of xblocks dictionary.
-            Dictionary object must have the following keys
+          list<XBlockContent>: A list of XBlockContent objects.
+            XBlockContent object must have the following keys
             1. key: xblock usage key
             2. content_type: xblock content type
             3. content: xblock text content
         """
 
     @abstractmethod
-    def get_all_xblocks_in_course(self, course_id: str):
+    def get_all_xblocks_in_course(self, course_id: str) -> Iterator[XBlockContent]:
         """
         Get iterator for all the unit/video xblocks in course.
 
         Returns:
-          iterator<dict>: An iterator of xblocks dictionary.
-            Dictionary object must have the following keys
+          iterator<XBlockContent>: An iterator of xblocks dictionary.
+            XBlockContent object must have the following keys
             1. key: xblock usage key
             2. content_type: xblock content type
             3. content: xblock text content

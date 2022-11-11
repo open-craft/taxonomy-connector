@@ -3,7 +3,7 @@
 An implementation of providers to be used in tests.
 """
 
-from taxonomy.providers import CourseMetadataProvider, ProgramMetadataProvider, XBlockMetadataProvider
+from taxonomy.providers import CourseMetadataProvider, ProgramMetadataProvider, XBlockContent, XBlockMetadataProvider
 from test_utils.mocks import MockCourse, MockProgram, MockXBlock
 
 
@@ -111,11 +111,11 @@ class DiscoveryXBlockMetadataProvider(XBlockMetadataProvider):
         else:
             xblocks = [MockXBlock(key=xblock_id) for xblock_id in xblock_ids]
 
-        return [{
-            'key': xblock.key,
-            'content_type': xblock.content_type,
-            'content': xblock.content,
-        } for xblock in xblocks]
+        return [XBlockContent(
+            key=xblock.key,
+            content_type=xblock.content_type,
+            content=xblock.content,
+        ) for xblock in xblocks]
 
     def get_all_xblocks_in_course(self, course_id: str):
         """
@@ -126,8 +126,8 @@ class DiscoveryXBlockMetadataProvider(XBlockMetadataProvider):
         else:
             xblocks = [MockXBlock() for _ in range(5)]
         for xblock in xblocks:
-            yield {
-                'key': xblock.key,
-                'content_type': xblock.content_type,
-                'content': xblock.content,
-            }
+            yield XBlockContent(
+                key=xblock.key,
+                content_type=xblock.content_type,
+                content=xblock.content,
+            )
