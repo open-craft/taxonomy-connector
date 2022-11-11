@@ -92,6 +92,26 @@ def get_product_skill_model_and_identifier(product_type):
     return product_skill
 
 
+def _create_product_with_hash(key_or_uuid, product_type, hash_content):
+    """
+    Create or update a product with hash of the text content.
+
+    Args:
+        key_or_uuid (str): product uuid
+        product_type (ProductTypes): type of product
+        hash_content (str): hash of content
+
+    Returns:
+        product object
+    """
+    model, identifier = get_product_skill_model_and_identifier(product_type)
+    product, _ = model.objects.update_or_create(
+        **{identifier: key_or_uuid},
+        defaults={"hash_content": hash_content, "auto_processed": True},
+    )
+    return product
+
+
 def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, product_type, **kwargs):
     """
     Persist the skills data in the database for Program, Course or XBlock.
@@ -109,13 +129,9 @@ def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, p
     """
     skill, _ = Skill.objects.update_or_create(external_id=skill_external_id, defaults=skill_data)
     if product_type == ProductTypes.XBlock:
-        x_model, x_identifier = get_product_skill_model_and_identifier(product_type)
-        product_type = ProductTypes.XBlockData
-        xblock, _ = x_model.objects.update_or_create(
-            **{x_identifier: key_or_uuid},
-            defaults={"hash_content": kwargs.get("hash_content"), "auto_processed": True},
-        )
+        xblock = _create_product_with_hash(key_or_uuid, product_type, kwargs.get("hash_content"))
         key_or_uuid = xblock.id
+        product_type = ProductTypes.XBlockData
     if is_skill_blacklisted(key_or_uuid, skill.id, product_type):
         return
     skill_model, identifier = get_product_skill_model_and_identifier(product_type)
@@ -135,6 +151,7 @@ def process_skills_data(product, skills, should_commit_to_db, product_type, **kw
         skills (dict): Course or Program skills data returned by the EMSI API.
         should_commit_to_db (bool): Boolean indicating whether data should be committed to database.
         product_type (str): String indicating about the product type.
+        **kwargs: It should contain `hash_content` in case the product_type is XBlockSkills
     """
     failures = []
     key_or_uuid = get_product_identifier(product_type)
@@ -191,7 +208,7 @@ def get_hash(text_data: str):
     """
     Return hash for given text_data.
     """
-    processed_text = text_data.replace(" ", "")
+    processed_text = text_data.replace(" ", "").strip()
     if not processed_text:
         return None
     return hashlib.md5(processed_text.encode()).hexdigest()
@@ -223,8 +240,8 @@ def skip_product_processing(extra_data: dict, key_or_uuid: str, product_type: Pr
     skill_filter = {
         identifier: key_or_uuid,
         "auto_processed": True,
+        **extra_data,
     }
-    skill_filter.update(extra_data)
     no_change = model.objects.filter(**skill_filter).exists()
     if no_change:
         # text with same hash exists, so skip further processing
