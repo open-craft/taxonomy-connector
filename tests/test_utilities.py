@@ -273,7 +273,7 @@ class TestUtils(TaxonomyTestCase):
         assert utils.is_skill_blacklisted(
             xblock.id,
             black_listed_xblock_skill.skill.id,
-            ProductTypes.XBlockThrough,
+            ProductTypes.XBlockData,
         ) is True
         xblock_skill = models.XBlockSkillData.objects.get(
             xblock=xblock,
@@ -282,7 +282,7 @@ class TestUtils(TaxonomyTestCase):
         assert xblock_skill.is_blacklisted is True
 
         # Make sure that skill that was not black listed is added with no issues.
-        assert utils.is_skill_blacklisted(xblock.id, self.skill.id, ProductTypes.XBlockThrough) is False
+        assert utils.is_skill_blacklisted(xblock.id, self.skill.id, ProductTypes.XBlockData) is False
         assert models.XBlockSkillData.objects.filter(
             xblock=xblock,
             skill=self.skill,
