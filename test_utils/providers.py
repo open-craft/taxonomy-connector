@@ -67,7 +67,7 @@ class DiscoveryProgramMetadataProvider(ProgramMetadataProvider):
         if self.mock_programs is not None:
             programs = self.mock_programs
         else:
-            programs = [MockCourse(uuid=program_id) for program_id in program_ids]
+            programs = [MockProgram(uuid=program_id) for program_id in program_ids]
 
         return [{
             'uuid': program.uuid,
