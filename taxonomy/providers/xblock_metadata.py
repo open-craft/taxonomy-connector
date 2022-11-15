@@ -5,11 +5,13 @@ Abstract base class for xblock metadata providers.
 All host platform must implement this provider in order for taxonomy to work.
 """
 from abc import abstractmethod
-from collections import namedtuple
-from typing import Iterator, List
+from typing import Iterator, List, NamedTuple
 
 
-XBlockContent = namedtuple("XBlockContent", ["key", "content_type", "content"])
+class XBlockContent(NamedTuple):
+    key: str
+    content_type: str
+    content: str
 
 
 class XBlockMetadataProvider:
