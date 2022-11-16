@@ -13,6 +13,11 @@ Change Log
 
 Unreleased
 
+[1.29.1] - 2022-11-28
+---------------------
+* Added xblocks to skill API.
+* Added xblocks API.
+
 [1.29.0] - 2022-11-28
 ---------------------
 * Added XBlockSkills and XBlockSkillData models.
