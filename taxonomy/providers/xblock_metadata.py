@@ -9,6 +9,9 @@ from typing import Iterator, List, NamedTuple
 
 
 class XBlockContent(NamedTuple):
+    """
+    NamedTuple to store xblock content.
+    """
     key: str
     content_type: str
     content: str
