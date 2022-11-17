@@ -138,7 +138,7 @@ class XBlockSkills(TimeStampedModel):
 
     class Meta:
         """
-        Meta configuration for CourseSkills model.
+        Meta configuration for XBlockSkills model.
         """
 
         verbose_name = 'XBlock Skills'
@@ -195,7 +195,7 @@ class XBlockSkillData(TimeStampedModel):
 
     class Meta:
         """
-        Meta configuration for CourseSkills model.
+        Meta configuration for XBlockSkillData model.
         """
 
         verbose_name = 'Xblock Skill data'
