@@ -10,6 +10,7 @@ from solo.models import SingletonModel
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 from model_utils.models import TimeStampedModel
 from taxonomy.choices import UserGoal
@@ -845,3 +846,24 @@ class Industry(models.Model):
         app_label = 'taxonomy'
         verbose_name = 'Industry'
         verbose_name_plural = 'Industries'
+
+class SkillVerificationSchedule(models.Model):
+    """
+    Model for storing the schedule for skill verification.
+    """
+    celery_task = models.ForeignKey(
+        PeriodicTask,
+        null=True,
+        blank=True,
+        editable=False,
+        on_delete=models.CASCADE,
+    )
+    interval = models.ForeignKey(IntervalSchedule, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return '<SkillVerificationSchedule task="{}" interval="{}>'.format(self.celery_task, self.interval)
+
+    # pylint: disable=missing-class-docstring,too-few-public-methods
+    class Meta:
+        verbose_name = _("Skills verification schedule")
+        verbose_name_plural = _("Skills verification schedules")

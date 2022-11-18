@@ -40,6 +40,8 @@ Notes:
 - In order to communicate with EMSI service, you need to set the values of ``client_id`` and ``client_secret``. These values are picked up from the host environment so you need to pass them in ``.yaml`` file of the host environment.
 - Also, to make taxonomy work, the host platform must add an implementation of data providers written in ``./taxonomy/providers``
 - Taxonomy APIs use throttle rate set in ``DEFAULT_THROTTLE_RATES`` settings by default. Custom Throttle rate can by set by adding ``ScopedRateThrottle`` class in ``DEFAULT_THROTTLE_CLASSES`` settings and ``taxonomy-api-throttle-scope`` key in ``DEFAULT_THROTTLE_RATES``
+- For the skill verification tasks to run, it requires ``django_celery_beat`` to be installed in your host environment. You can install the single-beat version by running ``pip install git+https://github.com/akachanov/single-beat@master#egg=single-beat``.
+- Also, You can configure the skill tags verification by setting the values of ``MIN_VOTES_FOR_SKILLS`` and ``RATIO_THRESHOLD_FOR_SKILLS`` in the host platform.
 
 
 .. code-block:: python
@@ -54,6 +56,7 @@ Notes:
             'taxonomy-api-throttle-scope': '60/min',  # custom throttle rate for taxonomy api
         },
     }
+    CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 
 Developer Notes

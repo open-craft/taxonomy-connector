@@ -17,6 +17,8 @@ from taxonomy.providers.utils import (
 
 LOGGER = logging.getLogger(__name__)
 
+from taxonomy.constants import MIN_VOTES_FOR_SKILLS, RATIO_THRESHOLD_FOR_SKILLS
+from taxonomy.models import XBlockSkillData
 
 @shared_task()
 def update_course_skills(course_uuids):
@@ -64,3 +66,22 @@ def update_xblock_skills(xblock_uuids):
         utils.refresh_product_skills(xblocks, True, ProductTypes.XBlock)
     else:
         LOGGER.warning('[TAXONOMY] No xblock found with uuids [%d] to update skills.', xblock_uuids)
+
+
+@shared_task()
+def check_for_skill_verification():
+    """
+    Task to check if skills tags in XblockSkillData are verified
+    """
+    LOGGER.info('Starting skills verification task')
+    unverified_skills = XBlockSkillData.objects.filter(verified=False)
+    for xblock_skill in unverified_skills:
+        has_valid_votes = bool(xblock_skill.relevant_count > MIN_VOTES_FOR_SKILLS)
+        total_count = int(xblock_skill.relavant_count + xblock_skill.irrelevant_count)
+        count_ratio = float(xblock_skill.relevant_count / total_count)
+        crosses_ratio_threshold = bool(count_ratio > RATIO_THRESHOLD_FOR_SKILLS)
+        if has_valid_votes and crosses_ratio_threshold:
+            xblock_skill.verified = True
+            xblock_skill.save()
+            LOGGER.info('[%s] skill has been verified', xblock_skill.skill.name)
+    LOGGER.info('Skills verification task is completed')

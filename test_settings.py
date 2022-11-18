@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django_celery_beat',
     'taxonomy',
 )
 
@@ -76,6 +77,8 @@ CELERY_TASK_ALWAYS_EAGER = True
 
 # In memory broker for tests
 CELERY_BROKER_URL = 'memory://localhost/'
+
+CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 ### END CELERY
 
