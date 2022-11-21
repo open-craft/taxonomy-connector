@@ -15,7 +15,13 @@ Unreleased
 
 [1.27.0] - 2022-11-03
 ---------------------
-* Added XBlockSkills and XBlockSkillThrough models.
+* Added XBlockSkills and XBlockSkillData models.
+* Added related celery tasks, abstract provider, signals and commands.
+
+[1.26.0] - 2022-10-31
+---------------------
+* Removed industry foreign key from JobSkills table and create a new table IndustryJobSkill.
+
 
 [1.26.0] - 2022-10-31
 ---------------------
