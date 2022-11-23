@@ -54,14 +54,14 @@ class MockProgram(MagicMock):
 
 class MockXBlock(MagicMock):
     """
-    Mock object for course.
+    Mock object for XBlock.
     """
     # pylint: disable=keyword-arg-before-vararg
     def __init__(
             self, key=DEFAULT, content_type=DEFAULT, content=DEFAULT, *args, **kwargs
     ):
         """
-        Initialize course related attributes.
+        Initialize XBlock related attributes.
         """
         super().__init__(*args, spec=dict, **kwargs)
 

@@ -9,7 +9,11 @@ from pytest import mark
 from taxonomy.models import CourseSkills, Skill, ProgramSkill, XBlockSkills
 from taxonomy.signals.signals import UPDATE_COURSE_SKILLS, UPDATE_PROGRAM_SKILLS, UPDATE_XBLOCK_SKILLS
 from test_utils.mocks import MockCourse, MockProgram, MockXBlock
-from test_utils.providers import DiscoveryCourseMetadataProvider, DiscoveryProgramMetadataProvider, DiscoveryXBlockMetadataProvider
+from test_utils.providers import (
+    DiscoveryCourseMetadataProvider,
+    DiscoveryProgramMetadataProvider,
+    DiscoveryXBlockMetadataProvider,
+)
 from test_utils.sample_responses.skills import SKILLS_EMSI_CLIENT_RESPONSE
 
 
@@ -75,7 +79,7 @@ class TaxonomySignalHandlerTests(unittest.TestCase):
         get_product_skills_mock.return_value = self.skills_emsi_client_response
         get_block_provider_mock.return_value = DiscoveryXBlockMetadataProvider([self.xblock])
 
-        # verify that no `Skill` and `ProgramSkill` records exist before executing the task
+        # verify that no `Skill` and `XBlockSkills` records exist before executing the task
         skill = Skill.objects.all()
         xblock_skill = XBlockSkills.objects.all()
         self.assertEqual(skill.count(), 0)

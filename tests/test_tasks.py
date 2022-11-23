@@ -147,12 +147,12 @@ class TaxonomyTasksTests(unittest.TestCase):
 
     @mock.patch('taxonomy.tasks.get_xblock_metadata_provider')
     @mock.patch('taxonomy.tasks.utils.EMSISkillsApiClient.get_product_skills')
-    def test_update_xblock_skills_task_with_no_xblock_found(self, get_course_skills_mock, get_course_provider_mock):
+    def test_update_xblock_skills_task_with_no_xblock_found(self, get_xblock_skills_mock, get_xblock_provider_mock):
         """
         Verify that `update_skills` task work as expected.
         """
-        get_course_skills_mock.return_value = self.skills_emsi_client_response
-        get_course_provider_mock.return_value = DiscoveryXBlockMetadataProvider([])
+        get_xblock_skills_mock.return_value = self.skills_emsi_client_response
+        get_xblock_provider_mock.return_value = DiscoveryXBlockMetadataProvider([])
 
         skill, xblock_skill = self.check_empty_skill_models(XBlockSkills)
 

@@ -13,7 +13,7 @@ Change Log
 
 Unreleased
 
-[1.29.0] - 2022-11-22
+[1.29.0] - 2022-11-23
 ---------------------
 * Added XBlockSkills and XBlockSkillData models.
 * Added related celery tasks, abstract provider, signals and commands.
