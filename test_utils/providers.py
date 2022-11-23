@@ -100,7 +100,7 @@ class DiscoveryXBlockMetadataProvider(XBlockMetadataProvider):
 
     def __init__(self, mock_xblocks=None):
         """
-        Initialize with mocked courses.
+        Initialize with mocked xblocks.
         """
         super(DiscoveryXBlockMetadataProvider, self).__init__()
         self.mock_xblocks = mock_xblocks

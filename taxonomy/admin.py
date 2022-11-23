@@ -177,5 +177,5 @@ class XBlockSkillDataAdmin(admin.ModelAdmin):
     Admin view for XBlockSkillData model.
     """
 
-    list_display = ('xblock', 'skill', 'relevant_count', 'verified', 'created', 'modified', 'is_blacklisted')
+    list_display = ('xblock', 'skill', 'verified_count', 'verified', 'created', 'modified', 'is_blacklisted')
     search_fields = ('skill__name',)

@@ -168,15 +168,15 @@ class XBlockSkillData(TimeStampedModel):
 
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
     xblock = models.ForeignKey(XBlockSkills, on_delete=models.CASCADE)
-    relevant_count = models.IntegerField(
+    verified_count = models.IntegerField(
         blank=True,
         null=True,
         help_text=_('Number of times learners verified this skill')
     )
-    irrelevant_count = models.IntegerField(
+    ignored_count = models.IntegerField(
         blank=True,
         null=True,
-        help_text=_('Number of times learners ignored this skill')
+        help_text=_('Number of times learners ignored giving feedback for this skill')
     )
     verified = models.BooleanField(
         default=False,
