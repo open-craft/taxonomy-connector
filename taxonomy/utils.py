@@ -93,19 +93,18 @@ def get_product_skill_model_and_identifier(product_type):
     return product_skill
 
 
-def _create_product_with_hash(key_or_uuid, product_type, hash_content):
+def _create_xblockskill_with_hash(key_or_uuid, hash_content):
     """
-    Create or update a product with hash of the text content.
+    Create or update a XBlockSkill object with hash of the text content.
 
     Args:
         key_or_uuid (str): product uuid
-        product_type (ProductTypes): type of product
         hash_content (str): hash of content
 
     Returns:
-        product object
+        XBlockSkills object
     """
-    model, identifier = get_product_skill_model_and_identifier(product_type)
+    model, identifier = get_product_skill_model_and_identifier(ProductTypes.XBlock)
     product, _ = model.objects.update_or_create(
         **{identifier: key_or_uuid},
         defaults={"hash_content": hash_content, "auto_processed": True},
@@ -130,7 +129,7 @@ def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, p
     """
     skill, _ = Skill.objects.update_or_create(external_id=skill_external_id, defaults=skill_data)
     if product_type == ProductTypes.XBlock:
-        xblock = _create_product_with_hash(key_or_uuid, product_type, kwargs.get("hash_content"))
+        xblock = _create_xblockskill_with_hash(key_or_uuid, kwargs.get('hash_content'))
         key_or_uuid = xblock.id
         product_type = ProductTypes.XBlockData
     if is_skill_blacklisted(key_or_uuid, skill.id, product_type):
@@ -290,13 +289,13 @@ def refresh_product_skills(products, should_commit_to_db, product_type):
                 continue
             # TODO: Skip translation for xblock text till we find better way to
             # handle huge amounts of text
-            if product_type != ProductTypes.XBlock:
+            if product_type == ProductTypes.XBlock:
+                # TODO: make sure that skill_attr_val is in english
+                translated_skill_attr = skill_attr_val
+            else:
                 translated_skill_attr = get_translated_skill_attribute_val(
                     product[key_or_uuid], skill_attr_val, product_type
                 )
-            else:
-                # TODO: make sure that skill_attr_val is in english
-                translated_skill_attr = skill_attr_val
             try:
                 # EMSI only allows 5 requests/sec
                 # We need to add one sec delay after every 5 requests to prevent 429 errors
