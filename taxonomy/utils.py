@@ -93,22 +93,21 @@ def get_product_skill_model_and_identifier(product_type):
     return product_skill
 
 
-def _create_product_with_hash(key_or_uuid, product_type, hash_content):
+def _create_xblockskill_with_hash(key_or_uuid, hash_content):
     """
-    Create or update a product with hash of the text content.
+    Create or update a XBlockSkill object with hash of the text content.
 
     Args:
         key_or_uuid (str): product uuid
-        product_type (ProductTypes): type of product
         hash_content (str): hash of content
 
     Returns:
-        product object
+        XBlockSkills object
     """
-    model, identifier = get_product_skill_model_and_identifier(product_type)
+    model, identifier = get_product_skill_model_and_identifier(ProductTypes.XBlock)
     product, _ = model.objects.update_or_create(
         **{identifier: key_or_uuid},
-        defaults={"hash_content": hash_content, "auto_processed": True},
+        defaults={'hash_content': hash_content, 'auto_processed': True},
     )
     return product
 
@@ -130,14 +129,14 @@ def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, p
     """
     skill, _ = Skill.objects.update_or_create(external_id=skill_external_id, defaults=skill_data)
     if product_type == ProductTypes.XBlock:
-        xblock = _create_product_with_hash(key_or_uuid, product_type, kwargs.get("hash_content"))
+        xblock = _create_xblockskill_with_hash(key_or_uuid, kwargs.get('hash_content'))
         key_or_uuid = xblock.id
         product_type = ProductTypes.XBlockData
     if is_skill_blacklisted(key_or_uuid, skill.id, product_type):
         return
     skill_model, identifier = get_product_skill_model_and_identifier(product_type)
-    condition = {identifier: key_or_uuid, "skill": skill}
-    defaults = {"confidence": confidence}
+    condition = {identifier: key_or_uuid, 'skill': skill}
+    defaults = {'confidence': confidence}
     _, created = skill_model.objects.update_or_create(**condition, defaults=defaults)
     action = 'created' if created else 'updated'
     LOGGER.info(f'{skill_model} {action} for key {key_or_uuid}')
@@ -223,7 +222,7 @@ def process_skill_attr_text(text_data: str, product_type: ProductTypes) -> dict:
     if product_type == ProductTypes.XBlock:
         hash_content = get_hash(text_data)
         if hash_content:
-            extra_data["hash_content"] = hash_content
+            extra_data['hash_content'] = hash_content
     return extra_data
 
 
@@ -240,7 +239,7 @@ def skip_product_processing(extra_data: dict, key_or_uuid: str, product_type: Pr
     model, identifier = get_product_skill_model_and_identifier(product_type)
     skill_filter = {
         identifier: key_or_uuid,
-        "auto_processed": True,
+        'auto_processed': True,
         **extra_data,
     }
     no_change = model.objects.filter(**skill_filter).exists()
@@ -257,7 +256,7 @@ def _convert_product_to_dict(product: Union[dict, tuple]):
     product_dict = None
     if isinstance(product, dict):
         product_dict = product
-    elif isinstance(product, tuple) and hasattr(product, "_asdict"):
+    elif isinstance(product, tuple) and hasattr(product, '_asdict'):
         product_dict = product._asdict()
     return product_dict
 
@@ -290,13 +289,13 @@ def refresh_product_skills(products, should_commit_to_db, product_type):
                 continue
             # TODO: Skip translation for xblock text till we find better way to
             # handle huge amounts of text
-            if product_type != ProductTypes.XBlock:
+            if product_type == ProductTypes.XBlock:
+                # TODO: make sure that skill_attr_val is in english
+                translated_skill_attr = skill_attr_val
+            else:
                 translated_skill_attr = get_translated_skill_attribute_val(
                     product[key_or_uuid], skill_attr_val, product_type
                 )
-            else:
-                # TODO: make sure that skill_attr_val is in english
-                translated_skill_attr = skill_attr_val
             try:
                 # EMSI only allows 5 requests/sec
                 # We need to add one sec delay after every 5 requests to prevent 429 errors

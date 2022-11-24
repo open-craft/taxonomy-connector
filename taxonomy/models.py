@@ -116,7 +116,7 @@ class XBlockSkills(TimeStampedModel):
     )
     skills = models.ManyToManyField(
         Skill,
-        through="XBlockSkillData",
+        through='XBlockSkillData',
         help_text=_(
             'The ID of the skill extracted for the xblock.'
         )
