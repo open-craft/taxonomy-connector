@@ -107,7 +107,7 @@ def _create_xblockskill_with_hash(key_or_uuid, hash_content):
     model, identifier = get_product_skill_model_and_identifier(ProductTypes.XBlock)
     product, _ = model.objects.update_or_create(
         **{identifier: key_or_uuid},
-        defaults={"hash_content": hash_content, "auto_processed": True},
+        defaults={'hash_content': hash_content, 'auto_processed': True},
     )
     return product
 
@@ -135,8 +135,8 @@ def update_skills_data(key_or_uuid, skill_external_id, confidence, skill_data, p
     if is_skill_blacklisted(key_or_uuid, skill.id, product_type):
         return
     skill_model, identifier = get_product_skill_model_and_identifier(product_type)
-    condition = {identifier: key_or_uuid, "skill": skill}
-    defaults = {"confidence": confidence}
+    condition = {identifier: key_or_uuid, 'skill': skill}
+    defaults = {'confidence': confidence}
     _, created = skill_model.objects.update_or_create(**condition, defaults=defaults)
     action = 'created' if created else 'updated'
     LOGGER.info(f'{skill_model} {action} for key {key_or_uuid}')
@@ -222,7 +222,7 @@ def process_skill_attr_text(text_data: str, product_type: ProductTypes) -> dict:
     if product_type == ProductTypes.XBlock:
         hash_content = get_hash(text_data)
         if hash_content:
-            extra_data["hash_content"] = hash_content
+            extra_data['hash_content'] = hash_content
     return extra_data
 
 
@@ -239,7 +239,7 @@ def skip_product_processing(extra_data: dict, key_or_uuid: str, product_type: Pr
     model, identifier = get_product_skill_model_and_identifier(product_type)
     skill_filter = {
         identifier: key_or_uuid,
-        "auto_processed": True,
+        'auto_processed': True,
         **extra_data,
     }
     no_change = model.objects.filter(**skill_filter).exists()
@@ -256,7 +256,7 @@ def _convert_product_to_dict(product: Union[dict, tuple]):
     product_dict = None
     if isinstance(product, dict):
         product_dict = product
-    elif isinstance(product, tuple) and hasattr(product, "_asdict"):
+    elif isinstance(product, tuple) and hasattr(product, '_asdict'):
         product_dict = product._asdict()
     return product_dict
 

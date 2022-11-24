@@ -49,7 +49,7 @@ class XBlockMetadataProviderValidator:
         """
         Validate `get_all_xblocks_in_course` methods has the correct interface implemented.
         """
-        xblocks = self.xblock_metadata_provider.get_all_xblocks_in_course("dummy-course-id")
+        xblocks = self.xblock_metadata_provider.get_all_xblocks_in_course('dummy-course-id')
 
         for xblock in xblocks:
             assert isinstance(xblock, XBlockContent)

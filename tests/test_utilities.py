@@ -243,7 +243,7 @@ class TestUtils(TaxonomyTestCase):
         updated_type_id = '1'
         updated_type_name = 'new_type'
         updated_description = 'new description'
-        hash_content = "xyz"
+        hash_content = 'xyz'
         skill_data = {
             'name': updated_name,
             'info_url': updated_info_url,
@@ -773,14 +773,14 @@ class TestUtils(TaxonomyTestCase):
         """
         Validate process_skill_attr_text and skip_product_processing returns correct data and flag.
         """
-        text = "some text"
+        text = 'some text'
         xblock = factories.XBlockSkillsFactory(usage_key=USAGE_KEY)
         extra_data = utils.process_skill_attr_text(text, ProductTypes.XBlock)
         skip = utils.skip_product_processing(extra_data, USAGE_KEY, ProductTypes.XBlock)
         # XBlock with new text should not skip.
         assert not skip
-        assert "hash_content" in extra_data
-        xblock.hash_content = extra_data["hash_content"]
+        assert 'hash_content' in extra_data
+        xblock.hash_content = extra_data['hash_content']
         xblock.auto_processed = True
         xblock.save()
 
