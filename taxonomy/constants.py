@@ -138,6 +138,6 @@ NAICS2_CODES = {
 }
 
 MIN_VOTES_FOR_SKILLS = settings.MIN_VOTES_FOR_SKILLS \
-    if hasattr(settings, "MIN_VOTES_FOR_SKILLS") else 0
+    if hasattr(settings, "MIN_VOTES_FOR_SKILLS") else None
 RATIO_THRESHOLD_FOR_SKILLS = settings.RATIO_THRESHOLD_FOR_SKILLS \
-    if hasattr(settings, "RATIO_THRESHOLD_FOR_SKILLS") else 1
+    if hasattr(settings, "RATIO_THRESHOLD_FOR_SKILLS") else None
