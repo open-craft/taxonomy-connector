@@ -69,5 +69,9 @@ class Command(BaseCommand):
                 if has_min_votes and crosses_ratio_threshold:
                     xblock_skill.verified = True
                     xblock_skill.save()
-                    LOGGER.info('[%s] xblockskill tag has been verified', xblock_skill.skill.name)
+                    LOGGER.info(
+                        '[%s] skill tag for the xblock [%s] has been verified',
+                        xblock_skill.skill.name,
+                        xblock_skill.xblock.usage_key
+                    )
         LOGGER.info('Xblockskill tags verification task is completed')

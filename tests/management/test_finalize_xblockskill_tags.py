@@ -138,7 +138,7 @@ class FinalizeSkillTagsCommandTests(TaxonomyTestCase):
                 messages,
                 [
                     'Starting xblockskill tags verification task',
-                    '[%s] xblockskill tag has been verified',
+                    '[%s] skill tag for the xblock [%s] has been verified',
                     'Xblockskill tags verification task is completed'
                 ]
             )
