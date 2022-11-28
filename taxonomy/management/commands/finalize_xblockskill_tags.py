@@ -48,29 +48,29 @@ class Command(BaseCommand):
         """
         LOGGER.info('Starting xblockskill tags verification task')
 
-        min_votes = options['min_votes'] if options.get('min_votes', None) else MIN_VOTES_FOR_SKILLS
-        ratio_threshold = options['ratio_threshold'] if options.get('ratio_threshold', None) else RATIO_THRESHOLD_FOR_SKILLS
+        min_votes = options.get('min_votes', None) or MIN_VOTES_FOR_SKILLS
+        ratio_threshold = options.get('ratio_threshold', None) or RATIO_THRESHOLD_FOR_SKILLS
 
-        if not min_votes:
+        if min_votes is None:
             raise InvalidCommandOptionsError('Either configure MIN_VOTES_FOR_SKILLS in settings \
                 or pass with arg --min-votes')
         
-        if not ratio_threshold:
+        if ratio_threshold is None:
             raise InvalidCommandOptionsError('Either configure RATIO_THRESHOLD_FOR_SKILLS in settings \
                 or pass with arg --ratio-threshold')
         
         with transaction.atomic():
             unverified_skills = XBlockSkillData.objects.filter(verified=False)
             for xblock_skill in unverified_skills:
-                verified_count = xblock_skill.verified_count if hasattr(xblock_skill, 'verified_count') else 0
-                ignored_count = xblock_skill.ignored_count if hasattr(xblock_skill, 'ignored_count') else 0
-                has_min_votes = bool(verified_count > min_votes)
+                verified_count = xblock_skill.verified_count if xblock_skill.verified_count else 0
+                ignored_count = xblock_skill.ignored_count if xblock_skill.ignored_count else 0
+                has_min_votes = bool(verified_count > int(min_votes))
                 total_count = int(verified_count + ignored_count)
                 if total_count > 0:
                     count_ratio = float(verified_count / total_count)
                 else:
                     count_ratio = 0
-                crosses_ratio_threshold = bool(count_ratio > ratio_threshold)
+                crosses_ratio_threshold = bool(count_ratio > float(ratio_threshold))
                 if has_min_votes and crosses_ratio_threshold:
                     xblock_skill.verified = True
                     xblock_skill.save()
