@@ -52,12 +52,12 @@ class Command(BaseCommand):
         ratio_threshold = options.get('ratio_threshold', None) or RATIO_THRESHOLD_FOR_SKILLS
 
         if min_votes is None:
-            raise InvalidCommandOptionsError('Either configure MIN_VOTES_FOR_SKILLS in settings \
-                or pass with arg --min-votes')
+            raise InvalidCommandOptionsError('Either configure MIN_VOTES_FOR_SKILLS in settings '
+                'or pass with arg --min-votes')
         
         if ratio_threshold is None:
-            raise InvalidCommandOptionsError('Either configure RATIO_THRESHOLD_FOR_SKILLS in settings \
-                or pass with arg --ratio-threshold')
+            raise InvalidCommandOptionsError('Either configure RATIO_THRESHOLD_FOR_SKILLS in settings '
+                'or pass with arg --ratio-threshold')
         
         with transaction.atomic():
             unverified_skills = XBlockSkillData.objects.filter(verified=False)
