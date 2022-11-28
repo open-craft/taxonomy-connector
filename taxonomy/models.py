@@ -171,11 +171,13 @@ class XBlockSkillData(TimeStampedModel):
     verified_count = models.IntegerField(
         blank=True,
         null=True,
+        default=0,
         help_text=_('Number of times learners verified this skill')
     )
     ignored_count = models.IntegerField(
         blank=True,
         null=True,
+        default=0,
         help_text=_('Number of times learners ignored giving feedback for this skill')
     )
     verified = models.BooleanField(
